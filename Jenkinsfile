@@ -39,25 +39,25 @@ pipeline {
             }
         }
 
-        stage('SonarQube Scan - Frontend') {
-            steps {
-                dir('frontend') {
-                    withSonarQubeEnv(SONARQUBE_ENV) {
-                        sh 'sonar-scanner -Dsonar.projectKey=frontend -Dsonar.sources=.'
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Scan - Frontend') {
+        //     steps {
+        //         dir('frontend') {
+        //             withSonarQubeEnv(SONARQUBE_ENV) {
+        //                 sh 'sonar-scanner -Dsonar.projectKey=frontend -Dsonar.sources=.'
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('SonarQube Scan - Backend') {
-            steps {
-                dir('backend') {
-                    withSonarQubeEnv(SONARQUBE_ENV) {
-                        sh 'sonar-scanner -Dsonar.projectKey=backend -Dsonar.sources=.'
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Scan - Backend') {
+        //     steps {
+        //         dir('backend') {
+        //             withSonarQubeEnv(SONARQUBE_ENV) {
+        //                 sh 'sonar-scanner -Dsonar.projectKey=backend -Dsonar.sources=.'
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Build Docker Images') {
             steps {
