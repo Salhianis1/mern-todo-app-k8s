@@ -5,7 +5,7 @@ pipeline {
         SONARQUBE_ENV = 'SonarQubeServer'   // Update this to your Jenkins SonarQube config name
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
-        DOCKERHUB_CREDENTIALS = 'dockerhub-creds' // Update this to your Jenkins credentials ID
+        DOCKERHUB_CREDENTIALS = 'docker-hub-credentials' // Update this to your Jenkins credentials ID
     }
 
     stages {
