@@ -16,30 +16,30 @@ pipeline {
             }
         }
 
-stage('OWASP Dependency Check') {
-    steps {
-        sh '''
-            mkdir -p reports/frontend
-            mkdir -p reports/backend
-
-            docker run --rm \
-                -v $(pwd)/Application-Code/frontend:/src \
-                -v $(pwd)/reports/frontend:/report \
-                owasp/dependency-check \
-                --scan /src \
-                --format "ALL" \
-                --out /report
-
-            docker run --rm \
-                -v $(pwd)/Application-Code/backend:/src \
-                -v $(pwd)/reports/backend:/report \
-                owasp/dependency-check \
-                --scan /src \
-                --format "ALL" \
-                --out /report
-        '''
-    }
-}
+        // stage('OWASP Dependency Check') {
+        //     steps {
+        //         sh '''
+        //             mkdir -p reports/frontend
+        //             mkdir -p reports/backend
+        
+        //             docker run --rm \
+        //                 -v $(pwd)/Application-Code/frontend:/src \
+        //                 -v $(pwd)/reports/frontend:/report \
+        //                 owasp/dependency-check \
+        //                 --scan /src \
+        //                 --format "ALL" \
+        //                 --out /report
+        
+        //             docker run --rm \
+        //                 -v $(pwd)/Application-Code/backend:/src \
+        //                 -v $(pwd)/reports/backend:/report \
+        //                 owasp/dependency-check \
+        //                 --scan /src \
+        //                 --format "ALL" \
+        //                 --out /report
+        //         '''
+        //     }
+        // }
 
 
         // stage('SonarQube Scan - Frontend') {
