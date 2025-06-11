@@ -65,8 +65,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    docker.build("${FRONTEND_IMAGE}", 'frontend')
-                    docker.build("${BACKEND_IMAGE}", 'backend')
+                    docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
+                    docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
                 }
             }
         }
