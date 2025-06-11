@@ -16,23 +16,23 @@ pipeline {
             }
         }
 
-        stage('OWASP Dependency Check') {
+                stage('OWASP Dependency Check') {
             steps {
                 sh '''
                     mkdir -p reports
                     docker run --rm \
-                        -v $(pwd)/frontend:/src/frontend \
+                        -v $(pwd)/Application-Code/frontend:/src \
                         -v $(pwd)/reports:/report \
                         owasp/dependency-check \
-                        --scan /src/frontend \
+                        --scan /src \
                         --format "ALL" \
                         --out /report/frontend
 
                     docker run --rm \
-                        -v $(pwd)/backend:/src/backend \
+                        -v $(pwd)/Application-Code/backend:/src \
                         -v $(pwd)/reports:/report \
                         owasp/dependency-check \
-                        --scan /src/backend \
+                        --scan /src \
                         --format "ALL" \
                         --out /report/backend
                 '''
