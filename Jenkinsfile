@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_ENV = 'SonarQubeServer'   // Update this to your Jenkins SonarQube config name
+        SONARQUBE_ENV = 'sonarqube'   // Update this to your Jenkins SonarQube config name
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials' // Update this to your Jenkins credentials ID
@@ -42,25 +42,25 @@ pipeline {
         // }
 
 
-        // stage('SonarQube Scan - Frontend') {
-        //     steps {
-        //         dir('frontend') {
-        //             withSonarQubeEnv(SONARQUBE_ENV) {
-        //                 sh 'sonar-scanner -Dsonar.projectKey=frontend -Dsonar.sources=.'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('SonarQube Scan - Frontend') {
+            steps {
+                dir('Application-Code/frontend') {
+                    withSonarQubeEnv(SONARQUBE_ENV) {
+                        sh 'sonar-scanner -Dsonar.projectKey=frontend -Dsonar.sources=.'
+                    }
+                }
+            }
+        }
 
-        // stage('SonarQube Scan - Backend') {
-        //     steps {
-        //         dir('backend') {
-        //             withSonarQubeEnv(SONARQUBE_ENV) {
-        //                 sh 'sonar-scanner -Dsonar.projectKey=backend -Dsonar.sources=.'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('SonarQube Scan - Backend') {
+            steps {
+                dir('Application-Code/backend') {
+                    withSonarQubeEnv(SONARQUBE_ENV) {
+                        sh 'sonar-scanner -Dsonar.projectKey=backend -Dsonar.sources=.'
+                    }
+                }
+            }
+        }
 
         stage('Build Docker Images') {
             steps {
