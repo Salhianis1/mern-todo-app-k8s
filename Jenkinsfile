@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+
+    tools {
+        sonarQubeScanner 'SonarScanner'  // Must match the name in "Global Tool Configuration"
+    }
 
     environment {
         SONARQUBE_TOKEN = credentials('sonarqube')        
@@ -20,14 +25,14 @@ pipeline {
         stage('SonarQube Scan - Backend') {
             steps {
                 dir('Application-Code/backend') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh """
+                    withSonarQubeEnv('sonarqube') {  // Must match the name under "Manage Jenkins → Configure System"
+                        sh '''
                             sonar-scanner \
                               -Dsonar.projectKey=backend-project \
                               -Dsonar.sources=. \
                               -Dsonar.host.url=$SONAR_HOST_URL \
                               -Dsonar.login=$SONARQUBE_TOKEN
-                        """
+                        '''
                     }
                 }
             }
@@ -37,17 +42,18 @@ pipeline {
             steps {
                 dir('Application-Code/frontend') {
                     withSonarQubeEnv('sonarqube') {
-                        sh """
+                        sh '''
                             sonar-scanner \
                               -Dsonar.projectKey=frontend-project \
                               -Dsonar.sources=. \
                               -Dsonar.host.url=$SONAR_HOST_URL \
                               -Dsonar.login=$SONARQUBE_TOKEN
-                        """
+                        '''
                     }
                 }
             }
         }
+    
 
         
         stage('Build Docker Images') {
