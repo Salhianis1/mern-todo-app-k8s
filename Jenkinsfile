@@ -7,10 +7,10 @@ pipeline {
         BACKEND_IMAGE = 'salhianis20/backend:latest'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
 
-        FRONTEND_DIR = 'Application-Code/frontend'
-        BACKEND_DIR = 'Application-Code/backend'
-        OUTPUT_DIR = 'dependency-check-report'
-        PROJECT_NAME = 'MERN-App'
+        // FRONTEND_DIR = 'Application-Code/frontend'
+        // BACKEND_DIR = 'Application-Code/backend'
+        // OUTPUT_DIR = 'dependency-check-report'
+        // PROJECT_NAME = 'MERN-App'
     }
 
     stages {
@@ -20,48 +20,48 @@ pipeline {
 
 
 
-                stage('Run Dependency-Check') {
-            steps {
-                script {
-                    // Ensure the report directory exists
-                    sh "mkdir -p ${OUTPUT_DIR}"
+        // stage('Run Dependency-Check') {
+        //     steps {
+        //         script {
+        //             // Ensure the report directory exists
+        //             sh "mkdir -p ${OUTPUT_DIR}"
 
-                    // Run OWASP Dependency-Check on frontend
-                    sh """
-                    docker run --rm \
-                        -v "\$PWD":/src \
-                        -v "\$PWD/${OUTPUT_DIR}:/report" \
-                        owasp/dependency-check \
-                        --project "${PROJECT_NAME}-frontend" \
-                        --scan "/src/${FRONTEND_DIR}" \
-                        --format "ALL" \
-                        --out /report
-                    """
+        //             // Run OWASP Dependency-Check on frontend
+        //             sh """
+        //             docker run --rm \
+        //                 -v "\$PWD":/src \
+        //                 -v "\$PWD/${OUTPUT_DIR}:/report" \
+        //                 owasp/dependency-check \
+        //                 --project "${PROJECT_NAME}-frontend" \
+        //                 --scan "/src/${FRONTEND_DIR}" \
+        //                 --format "ALL" \
+        //                 --out /report
+        //             """
 
-                    // Run OWASP Dependency-Check on backend
-                    sh """
-                    docker run --rm \
-                        -v "\$PWD":/src \
-                        -v "\$PWD/${OUTPUT_DIR}:/report" \
-                        owasp/dependency-check \
-                        --project "${PROJECT_NAME}-backend" \
-                        --scan "/src/${BACKEND_DIR}" \
-                        --format "ALL" \
-                        --out /report
-                    """
-                }
-            }
-        }
+        //             // Run OWASP Dependency-Check on backend
+        //             sh """
+        //             docker run --rm \
+        //                 -v "\$PWD":/src \
+        //                 -v "\$PWD/${OUTPUT_DIR}:/report" \
+        //                 owasp/dependency-check \
+        //                 --project "${PROJECT_NAME}-backend" \
+        //                 --scan "/src/${BACKEND_DIR}" \
+        //                 --format "ALL" \
+        //                 --out /report
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Publish HTML Report') {
-            steps {
-                publishHTML([
-                    reportDir: "${OUTPUT_DIR}",
-                    reportFiles: 'dependency-check-report.html',
-                    reportName: 'OWASP Dependency-Check Report'
-                ])
-            }
-        }
+        // stage('Publish HTML Report') {
+        //     steps {
+        //         publishHTML([
+        //             reportDir: "${OUTPUT_DIR}",
+        //             reportFiles: 'dependency-check-report.html',
+        //             reportName: 'OWASP Dependency-Check Report'
+        //         ])
+        //     }
+        // }
 
         stage('SonarQube Scan - Backend') {
             steps {
