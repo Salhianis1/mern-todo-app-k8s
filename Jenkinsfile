@@ -1,31 +1,26 @@
 pipeline {
     agent any
-    
 
     tools {
-        sonarQubeScanner 'SonarScanner'  // Must match the name in "Global Tool Configuration"
+        sonarQubeScanner 'SonarScanner'
     }
 
     environment {
-        SONARQUBE_TOKEN = credentials('sonarqube')        
+        SONARQUBE_TOKEN = credentials('sonarqube')
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
-        DOCKERHUB_CREDENTIALS = 'docker-hub-credentials' // Update this to your Jenkins credentials ID
+        DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
     }
 
     stages {
-
         stage('Checkout') {
-            steps {
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
-        
         stage('SonarQube Scan - Backend') {
             steps {
                 dir('Application-Code/backend') {
-                    withSonarQubeEnv('sonarqube') {  // Must match the name under "Manage Jenkins → Configure System"
+                    withSonarQubeEnv('sonarqube') {
                         sh '''
                             sonar-scanner \
                               -Dsonar.projectKey=backend-project \
@@ -53,9 +48,15 @@ pipeline {
                 }
             }
         }
-    
 
-        
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 script {
@@ -68,8 +69,9 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                    trivy image ${FRONTEND_IMAGE} > reports/trivy_frontend.txt
-                    trivy image ${BACKEND_IMAGE} > reports/trivy_backend.txt
+                    mkdir -p reports
+                    trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
+                    trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
                 '''
             }
         }
@@ -85,5 +87,4 @@ pipeline {
             }
         }
     }
-
 }
