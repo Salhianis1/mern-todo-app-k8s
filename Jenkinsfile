@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_ENV = 'sonarqube'   // Update this to your Jenkins SonarQube config name
+        SONARQUBE_TOKEN = credentials('sonarqube')        
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials' // Update this to your Jenkins credentials ID
@@ -16,52 +16,40 @@ pipeline {
             }
         }
 
-        // stage('OWASP Dependency Check') {
-        //     steps {
-        //         sh '''
-        //             mkdir -p reports/frontend
-        //             mkdir -p reports/backend
         
-        //             docker run --rm \
-        //                 -v $(pwd)/Application-Code/frontend:/src \
-        //                 -v $(pwd)/reports/frontend:/report \
-        //                 owasp/dependency-check \
-        //                 --scan /src \
-        //                 --format "ALL" \
-        //                 --out /report
-        
-        //             docker run --rm \
-        //                 -v $(pwd)/Application-Code/backend:/src \
-        //                 -v $(pwd)/reports/backend:/report \
-        //                 owasp/dependency-check \
-        //                 --scan /src \
-        //                 --format "ALL" \
-        //                 --out /report
-        //         '''
-        //     }
-        // }
-
+        stage('SonarQube Scan - Backend') {
+            steps {
+                dir('Application-Code/backend') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh """
+                            sonar-scanner \
+                              -Dsonar.projectKey=backend-project \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=$SONAR_HOST_URL \
+                              -Dsonar.login=$SONARQUBE_TOKEN
+                        """
+                    }
+                }
+            }
+        }
 
         stage('SonarQube Scan - Frontend') {
             steps {
                 dir('Application-Code/frontend') {
-                    withSonarQubeEnv(SONARQUBE_ENV) {
-                        sh 'sonar-scanner -Dsonar.projectKey=frontend -Dsonar.sources=.'
+                    withSonarQubeEnv('sonarqube') {
+                        sh """
+                            sonar-scanner \
+                              -Dsonar.projectKey=frontend-project \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=$SONAR_HOST_URL \
+                              -Dsonar.login=$SONARQUBE_TOKEN
+                        """
                     }
                 }
             }
         }
 
-        stage('SonarQube Scan - Backend') {
-            steps {
-                dir('Application-Code/backend') {
-                    withSonarQubeEnv(SONARQUBE_ENV) {
-                        sh 'sonar-scanner -Dsonar.projectKey=backend -Dsonar.sources=.'
-                    }
-                }
-            }
-        }
-
+        
         stage('Build Docker Images') {
             steps {
                 script {
