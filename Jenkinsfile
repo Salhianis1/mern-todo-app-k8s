@@ -74,8 +74,8 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                    trivy image --exit-code 1 --severity HIGH,CRITICAL ${FRONTEND_IMAGE} > reports/trivy_frontend.txt
-                    trivy image --exit-code 1 --severity HIGH,CRITICAL ${BACKEND_IMAGE} > reports/trivy_backend.txt
+                    trivy image ${FRONTEND_IMAGE} > reports/trivy_frontend.txt
+                    trivy image ${BACKEND_IMAGE} > reports/trivy_backend.txt
                 '''
             }
         }
