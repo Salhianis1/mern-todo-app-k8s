@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQubeScanner 'SonarScanner'
-    }
-
     environment {
         SONARQUBE_TOKEN = credentials('sonarqube')
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
