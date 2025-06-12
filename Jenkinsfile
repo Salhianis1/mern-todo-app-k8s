@@ -92,12 +92,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            archiveArtifacts artifacts: 'reports/**/*.*', allowEmptyArchive: true
-        }
-        failure {
-            echo 'Build failed. Please check logs.'
-        }
-    }
 }
