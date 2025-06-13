@@ -16,7 +16,7 @@ spec:
       containers:
       - name: mon
         image: mongo:4.4.6
-        imagePullPolicy: Allways
+        imagePullPolicy: Always
         command:
             - "numactl"
             - "--interleave=all"
