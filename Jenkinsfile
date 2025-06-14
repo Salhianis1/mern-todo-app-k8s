@@ -257,7 +257,7 @@ pipeline {
                             vaultUrl: 'http://127.0.0.1:8200'
                         ],
                         vaultSecrets: [[
-                            path: 'secret/data/dockerhub-creds',
+                            path: 'secrets/dockerhub-creds',
                             secretValues: [
                                 [envVar: 'DOCKERHUB_USERNAME', vaultKey: 'username'],
                                 [envVar: 'DOCKERHUB_PASSWORD', vaultKey: 'password']
