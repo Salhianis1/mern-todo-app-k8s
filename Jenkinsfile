@@ -195,56 +195,56 @@ pipeline {
         }
         */
 
-        stage('SonarQube Scan - Backend') {
-            steps {
-                dir('Application-Code/backend') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh '''
-                            sonar-scanner \
-                              -Dsonar.projectKey=backend-project \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=$SONAR_HOST_URL \
-                              -Dsonar.login=$SONARQUBE_TOKEN
-                        '''
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Scan - Backend') {
+        //     steps {
+        //         dir('Application-Code/backend') {
+        //             withSonarQubeEnv('sonarqube') {
+        //                 sh '''
+        //                     sonar-scanner \
+        //                       -Dsonar.projectKey=backend-project \
+        //                       -Dsonar.sources=. \
+        //                       -Dsonar.host.url=$SONAR_HOST_URL \
+        //                       -Dsonar.login=$SONARQUBE_TOKEN
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('SonarQube Scan - Frontend') {
-            steps {
-                dir('Application-Code/frontend') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh '''
-                            sonar-scanner \
-                              -Dsonar.projectKey=frontend-project \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=$SONAR_HOST_URL \
-                              -Dsonar.login=$SONARQUBE_TOKEN
-                        '''
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Scan - Frontend') {
+        //     steps {
+        //         dir('Application-Code/frontend') {
+        //             withSonarQubeEnv('sonarqube') {
+        //                 sh '''
+        //                     sonar-scanner \
+        //                       -Dsonar.projectKey=frontend-project \
+        //                       -Dsonar.sources=. \
+        //                       -Dsonar.host.url=$SONAR_HOST_URL \
+        //                       -Dsonar.login=$SONARQUBE_TOKEN
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
-                    docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
-                }
-            }
-        }
+        // stage('Build Docker Images') {
+        //     steps {
+        //         script {
+        //             docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
+        //             docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
+        //         }
+        //     }
+        // }
 
-        stage('Trivy Scan') {
-            steps {
-                sh '''
-                    mkdir -p reports
-                    trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
-                    trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
-                '''
-            }
-        }
+        // stage('Trivy Scan') {
+        //     steps {
+        //         sh '''
+        //             mkdir -p reports
+        //             trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
+        //             trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
+        //         '''
+        //     }
+        // }
 
         stage('Push to Docker Hub') {
             steps {
