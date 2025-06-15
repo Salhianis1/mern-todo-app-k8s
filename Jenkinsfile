@@ -114,31 +114,57 @@ pipeline {
         //     }
         // }
 
-    stage('Push to Docker Hub') {
-        steps {
-            script {
-                withVault(
-                    configuration: [
-                        vaultCredentialId: 'vault-cred',
-                        vaultUrl: 'http://127.0.0.1:8200'
-                    ],
-                    vaultSecrets: [[
-                        path: 'secret/dockerhub-creds', // KV v2!
-                        secretValues: [
-                            [envVar: 'DOCKERHUB_USERNAME', vaultKey: 'username'],
-                            [envVar: 'DOCKERHUB_PASSWORD', vaultKey: 'password']
-                        ]
-                    ]]
-                ) {
-                    sh '''
-                        echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-                        docker push ${FRONTEND_IMAGE}
-                        docker push ${BACKEND_IMAGE}
-                    '''
-                }
-            }
+    // stage('Push to Docker Hub') {
+    //     steps {
+    //         script {
+    //             withVault(
+    //                 configuration: [
+    //                     vaultCredentialId: 'vault-cred',
+    //                     vaultUrl: 'http://127.0.0.1:8200'
+    //                 ],
+    //                 vaultSecrets: [[
+    //                     path: 'secret/dockerhub-creds', // KV v2!
+    //                     secretValues: [
+    //                         [envVar: 'DOCKERHUB_USERNAME', vaultKey: 'username'],
+    //                         [envVar: 'DOCKERHUB_PASSWORD', vaultKey: 'password']
+    //                     ]
+    //                 ]]
+    //             ) {
+    //                 sh '''
+    //                     echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    //                     docker push ${FRONTEND_IMAGE}
+    //                     docker push ${BACKEND_IMAGE}
+    //                 '''
+    //             }
+    //         }
+    //     }
+    // }
+
+        pipeline {
+  agent any
+  environment {
+    VAULT_CREDENTIALS_ID = 'vault-cred'  // Must match Jenkins credential ID
+  }
+  stages {
+    stage('Read secret from Vault') {
+      steps {
+        withVault(
+          vaultSecrets: [
+            [path: 'secret/data/dockerhub-creds', secretValues: [
+              [envVar: 'USERNAME', vaultKey: 'username'],
+              [envVar: 'PASSWORD', vaultKey: 'password']
+            ]]
+          ],
+          vaultCredentialId: "${VAULT_CREDENTIALS_ID}",
+          vaultUrl: 'http://127.0.0.1:8200'
+        ) {
+          sh 'echo "Username is $USERNAME"'
         }
+      }
     }
+  }
+}
+
 
 }
 }
