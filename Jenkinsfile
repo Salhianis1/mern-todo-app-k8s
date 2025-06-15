@@ -63,100 +63,67 @@ pipeline {
         //     }
         // }
 
-        // stage('SonarQube Scan - Backend') {
-        //     steps {
-        //         dir('Application-Code/backend') {
-        //             withSonarQubeEnv('sonarqube') {
-        //                 sh '''
-        //                     sonar-scanner \
-        //                       -Dsonar.projectKey=backend-project \
-        //                       -Dsonar.sources=. \
-        //                       -Dsonar.host.url=$SONAR_HOST_URL \
-        //                       -Dsonar.login=$SONARQUBE_TOKEN
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('SonarQube Scan - Frontend') {
-        //     steps {
-        //         dir('Application-Code/frontend') {
-        //             withSonarQubeEnv('sonarqube') {
-        //                 sh '''
-        //                     sonar-scanner \
-        //                       -Dsonar.projectKey=frontend-project \
-        //                       -Dsonar.sources=. \
-        //                       -Dsonar.host.url=$SONAR_HOST_URL \
-        //                       -Dsonar.login=$SONARQUBE_TOKEN
-        //                 '''
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Build Docker Images') {
-        //     steps {
-        //         script {
-        //             docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
-        //             docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
-        //         }
-        //     }
-        // }
-
-        // stage('Trivy Scan') {
-        //     steps {
-        //         sh '''
-        //             mkdir -p reports
-        //             trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
-        //             trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
-        //         '''
-        //     }
-        // }
-
-        
-        stage('Read secrets from Vault') {
+        stage('SonarQube Scan - Backend') {
             steps {
-                script {
-                    withVault(
-                        configuration: [
-                            vaultUrl: 'http://127.0.0.1:8200',
-                            vaultCredentialId: 'vault-cred-token',
-                            engineVersion: 2,
-                            disableChildPoliciesOverride: false,
-                            timeout: 60
-                        ],
-                        vaultSecrets: [
-                            [
-                                path: 'secret/dockerhub-creds',
-                                secretValues: [
-                                    [vaultKey: 'username', envVar: 'DOCKERHUB_USERNAME'],
-                                    [vaultKey: 'password', envVar: 'DOCKERHUB_PASSWORD']
-                                ]
-                            ]
-                        ]
-                    ) {
-                        // Use the secrets (avoid printing passwords!)
-                        echo "Username from Vault: ${env.DOCKERHUB_USERNAME}"
-                        // Avoid printing password
-                        // echo "Password from Vault: ${env.DOCKERHUB_PASSWORD}"
-
-                        // Simulate Docker login (example)
-                        // sh "echo ${env.DOCKERHUB_PASSWORD} | docker login -u ${env.DOCKERHUB_USERNAME} --password-stdin"
+                dir('Application-Code/backend') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh '''
+                            sonar-scanner \
+                              -Dsonar.projectKey=backend-project \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=$SONAR_HOST_URL \
+                              -Dsonar.login=$SONARQUBE_TOKEN
+                        '''
                     }
                 }
             }
         }
 
-        // stage('Push to Docker Hub') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-        //                 docker.image("${FRONTEND_IMAGE}").push()
-        //                 docker.image("${BACKEND_IMAGE}").push()
-        //             }
-        //         }
-        //     }
-        // }
+        stage('SonarQube Scan - Frontend') {
+            steps {
+                dir('Application-Code/frontend') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh '''
+                            sonar-scanner \
+                              -Dsonar.projectKey=frontend-project \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=$SONAR_HOST_URL \
+                              -Dsonar.login=$SONARQUBE_TOKEN
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
+                    docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
+                }
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                    mkdir -p reports
+                    trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
+                    trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
+                '''
+            }
+        }
+
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        docker.image("${FRONTEND_IMAGE}").push()
+                        docker.image("${BACKEND_IMAGE}").push()
+                    }
+                }
+            }
+        }
     }
 }
