@@ -122,6 +122,7 @@ pipeline {
                         configuration: [
                             vaultUrl: 'http://127.0.0.1:8200',
                             vaultCredentialId: 'vault-cred-token',
+                            engineVersion: 2,
                             disableChildPoliciesOverride: false,
                             timeout: 60
                         ],
