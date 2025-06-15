@@ -3,6 +3,7 @@ pipeline {
     agent any
 
     environment {
+        VAULT_CREDENTIALS_ID = 'vault-cred'  // Must match Jenkins credential ID
         SONARQUBE_TOKEN = credentials('sonarqube')
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
@@ -140,11 +141,6 @@ pipeline {
     //     }
     // }
 
-        pipeline {
-  agent any
-  environment {
-    VAULT_CREDENTIALS_ID = 'vault-cred'  // Must match Jenkins credential ID
-  }
   stages {
     stage('Read secret from Vault') {
       steps {
