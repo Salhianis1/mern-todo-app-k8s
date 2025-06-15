@@ -119,7 +119,7 @@ pipeline {
             script {
                 withVault(
                     configuration: [
-                        vaultCredentialId: 'vault-cred',
+                        vaultCredentialId: 'vault',
                         vaultUrl: 'http://127.0.0.1:8200'
                     ],
                     vaultSecrets: [[
