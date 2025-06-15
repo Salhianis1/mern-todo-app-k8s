@@ -113,16 +113,47 @@ pipeline {
                 '''
             }
         }
-
-        stage('Push to Docker Hub') {
+        stage('Read secrets from Vault') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        docker.image("${FRONTEND_IMAGE}").push()
-                        docker.image("${BACKEND_IMAGE}").push()
+                    withVault(
+                        configuration: [
+                            vaultUrl: 'http://127.0.0.1:8200',
+                            vaultCredentialId: 'vault-cred-token',
+                            disableChildPoliciesOverride: false,
+                            timeout: 60
+                        ],
+                        vaultSecrets: [
+                            [
+                                path: 'secret/dockerhub-creds',
+                                secretValues: [
+                                    [vaultKey: 'username', envVar: 'DOCKERHUB_USERNAME'],
+                                    [vaultKey: 'password', envVar: 'DOCKERHUB_PASSWORD']
+                                ]
+                            ]
+                        ]
+                    ) {
+                        // Use the secrets (avoid printing passwords!)
+                        echo "Username from Vault: ${env.DOCKERHUB_USERNAME}"
+                        // Avoid printing password
+                        // echo "Password from Vault: ${env.DOCKERHUB_PASSWORD}"
+
+                        // Simulate Docker login (example)
+                        // sh "echo ${env.DOCKERHUB_PASSWORD} | docker login -u ${env.DOCKERHUB_USERNAME} --password-stdin"
                     }
                 }
             }
         }
+
+        // stage('Push to Docker Hub') {
+        //     steps {
+        //         script {
+        //             docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+        //                 docker.image("${FRONTEND_IMAGE}").push()
+        //                 docker.image("${BACKEND_IMAGE}").push()
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
