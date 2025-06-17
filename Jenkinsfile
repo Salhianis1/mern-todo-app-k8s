@@ -119,7 +119,7 @@ pipeline {
             steps {
                 withVault([
                     vaultSecrets: [[
-                        path: 'kv/dockerhub-credes',
+                        path: 'kv/dockerhub-creds',
                         secretValues: [
                             [envVar: 'DOCKER_USERNAME', vaultKey: 'username'],
                             [envVar: 'DOCKER_PASSWORD', vaultKey: 'password']
