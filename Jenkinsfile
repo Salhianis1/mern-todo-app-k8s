@@ -117,10 +117,21 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        docker.image("${FRONTEND_IMAGE}").push()
-                        docker.image("${BACKEND_IMAGE}").push()
+                withVault([
+                    vaultSecrets: [[
+                        path: 'kv/dockerhub-credes',
+                        secretValues: [
+                            [envVar: 'DOCKER_USERNAME', vaultKey: 'username'],
+                            [envVar: 'DOCKER_PASSWORD', vaultKey: 'password']
+                        ]
+                    ]]
+                ]) {
+                    script {
+                        sh '''
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                            docker push "${FRONTEND_IMAGE}"
+                            docker push "${BACKEND_IMAGE}"
+                        '''
                     }
                 }
             }
