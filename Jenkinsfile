@@ -32,15 +32,15 @@ pipeline {
 
         stage('OWASP Dependency-Check (CLI)') {
             steps {
-                sh '''
-                    mkdir -p dependency-check-report
-                    dependency-check --project "${PROJECT_NAME}" \
-                        --scan . \
-                        --format "ALL" \
-                        --out dependency-check-report \
-                        --prettyPrint \
-                        --enableNodeJS
-                '''
+                    sh '''
+                        mkdir -p dependency-check-report
+                        /opt/dependency-check/dependency-check/bin/dependency-check.sh --project "${PROJECT_NAME}" \
+                            --scan . \
+                            --format "ALL" \
+                            --out dependency-check-report \
+                            --prettyPrint \
+                            --enableNodeJS
+                    '''
             }
         }
 
