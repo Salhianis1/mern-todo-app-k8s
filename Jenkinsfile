@@ -19,6 +19,38 @@ pipeline {
         }
 
 
+                stage('Install Dependencies') {
+            steps {
+                dir("${FRONTEND_DIR}") {
+                    sh 'npm install'
+                }
+                dir("${BACKEND_DIR}") {
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('OWASP Dependency-Check (CLI)') {
+            steps {
+                sh '''
+                    mkdir -p dependency-check-report
+                    dependency-check --project "${PROJECT_NAME}" \
+                        --scan . \
+                        --format "ALL" \
+                        --out dependency-check-report \
+                        --prettyPrint \
+                        --enableNodeJS
+                '''
+            }
+        }
+
+        stage('Archive Dependency-Check Report') {
+            steps {
+                archiveArtifacts artifacts: 'dependency-check-report/**', fingerprint: true
+            }
+        }
+
+
 
         stage('Install Dependencies') {
             steps {
