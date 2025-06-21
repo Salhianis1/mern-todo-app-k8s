@@ -38,9 +38,8 @@ pipeline {
                             --scan . \
                             --format "ALL" \
                             --out dependency-check-report \
-                            --prettyPrint \
-                            --enableNodeJS
-                    '''
+                            --prettyPrint
+                        '''
             }
         }
 
