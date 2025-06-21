@@ -39,7 +39,7 @@ pipeline {
                     -s "./"
                     -f "ALL"
                     --prettyPrint
-                    --nvdApiKey "3ece664b-2f90-44c6-aab2-8276e2861b98"
+                    --nvdApiKey ${NVD_API_KEY}
                     --enableNodeJS''',
                     odcInstallation: 'OWASP-DC'
             }
