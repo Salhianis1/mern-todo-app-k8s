@@ -9,6 +9,7 @@ pipeline {
 
         FRONTEND_DIR = 'Application-Code/frontend'
         BACKEND_DIR = 'Application-Code/backend'
+        NVD_API_KEY = credentials('NVD_API_KEY')
         // OUTPUT_DIR = 'dependency-check-report'
         PROJECT_NAME = 'MERN-App'
     }
@@ -38,7 +39,8 @@ pipeline {
                             --scan . \
                             --format "ALL" \
                             --out dependency-check-report \
-                            --prettyPrint
+                            --prettyPrint \
+                            --nvdApiKey ${YOUR_NVD_API_KEY}
                         '''
             }
         }
