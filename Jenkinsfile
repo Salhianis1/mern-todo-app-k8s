@@ -19,7 +19,7 @@ pipeline {
         }
 
 
-                stage('Install Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 dir("${FRONTEND_DIR}") {
                     sh 'npm install'
@@ -52,36 +52,36 @@ pipeline {
 
 
 
-        stage('Install Dependencies') {
-            steps {
-                // Install dependencies for client and server
-                dir("${FRONTEND_DIR}") {
-                    sh 'npm install'
-                }
-                dir("${BACKEND_DIR}") {
-                    sh 'npm install'
-                }
-            }
-        }
-        stage('OWASP Dependency-Check') {
-            steps {
-                // Run Dependency-Check for vulnerability scanning
-                dependencyCheck additionalArguments: '''
-                    -o "./dependency-check-report"
-                    -s "./"
-                    -f "ALL"
-                    --prettyPrint
-                    --nvdApiKey ${NVD_API_KEY}
-                    --enableNodeJS''',
-                    odcInstallation: 'OWASP-DC'
-            }
-        }
-        stage('Publish Dependency-Check Report') {
-            steps {
-                // Publish the XML report
-                dependencyCheckPublisher pattern: 'dependency-check-report/dependency-check-report.xml'
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         // Install dependencies for client and server
+        //         dir("${FRONTEND_DIR}") {
+        //             sh 'npm install'
+        //         }
+        //         dir("${BACKEND_DIR}") {
+        //             sh 'npm install'
+        //         }
+        //     }
+        // }
+        // stage('OWASP Dependency-Check') {
+        //     steps {
+        //         // Run Dependency-Check for vulnerability scanning
+        //         dependencyCheck additionalArguments: '''
+        //             -o "./dependency-check-report"
+        //             -s "./"
+        //             -f "ALL"
+        //             --prettyPrint
+        //             --nvdApiKey ${NVD_API_KEY}
+        //             --enableNodeJS''',
+        //             odcInstallation: 'OWASP-DC'
+        //     }
+        // }
+        // stage('Publish Dependency-Check Report') {
+        //     steps {
+        //         // Publish the XML report
+        //         dependencyCheckPublisher pattern: 'dependency-check-report/dependency-check-report.xml'
+        //     }
+        // }
 
         // stage('SonarQube Scan - Backend') {
         //     steps {
