@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_TOKEN = credentials('sonarqube')
+        // SONARQUBE_TOKEN = credentials('sonarqube')
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
