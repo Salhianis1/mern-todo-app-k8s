@@ -40,7 +40,7 @@ pipeline {
                             --format "ALL" \
                             --out dependency-check-report \
                             --prettyPrint \
-                            --nvdApiKey ${YOUR_NVD_API_KEY}
+                            --nvdApiKey ${NVD_API_KEY}
                         '''
             }
         }
