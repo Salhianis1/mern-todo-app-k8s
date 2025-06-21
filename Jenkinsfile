@@ -23,10 +23,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 // Install dependencies for client and server
-                dir('FRONTEND_DIR') {
+                dir("${FRONTEND_DIR}") {
                     sh 'npm install'
                 }
-                dir('BACKEND_DIR') {
+                dir("${BACKEND_DIR}") {
                     sh 'npm install'
                 }
             }
@@ -39,7 +39,7 @@ pipeline {
                     -s "./"
                     -f "ALL"
                     --prettyPrint
-                    --nvdApiKey "your-nvd-api-key"
+                    --nvdApiKey "3ece664b-2f90-44c6-aab2-8276e2861b98"
                     --enableNodeJS''',
                     odcInstallation: 'OWASP-DC'
             }
