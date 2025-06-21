@@ -7,10 +7,10 @@ pipeline {
         BACKEND_IMAGE = 'salhianis20/backend:latest'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
 
-        // FRONTEND_DIR = 'Application-Code/frontend'
-        // BACKEND_DIR = 'Application-Code/backend'
+        FRONTEND_DIR = 'Application-Code/frontend'
+        BACKEND_DIR = 'Application-Code/backend'
         // OUTPUT_DIR = 'dependency-check-report'
-        // PROJECT_NAME = 'MERN-App'
+        PROJECT_NAME = 'MERN-App'
     }
 
     stages {
@@ -20,121 +20,109 @@ pipeline {
 
 
 
-        // stage('Run Dependency-Check') {
+        stage('Install Dependencies') {
+            steps {
+                // Install dependencies for client and server
+                dir('FRONTEND_DIR') {
+                    sh 'npm install'
+                }
+                dir('BACKEND_DIR') {
+                    sh 'npm install'
+                }
+            }
+        }
+        stage('OWASP Dependency-Check') {
+            steps {
+                // Run Dependency-Check for vulnerability scanning
+                dependencyCheck additionalArguments: '''
+                    -o "./dependency-check-report"
+                    -s "./"
+                    -f "ALL"
+                    --prettyPrint
+                    --nvdApiKey "your-nvd-api-key"
+                    --enableNodeJS''',
+                    odcInstallation: 'OWASP-DC'
+            }
+        }
+        stage('Publish Dependency-Check Report') {
+            steps {
+                // Publish the XML report
+                dependencyCheckPublisher pattern: 'dependency-check-report/dependency-check-report.xml'
+            }
+        }
+
+        // stage('SonarQube Scan - Backend') {
         //     steps {
-        //         script {
-        //             // Ensure the report directory exists
-        //             sh "mkdir -p ${OUTPUT_DIR}"
-
-        //             // Run OWASP Dependency-Check on frontend
-        //             sh """
-        //             docker run --rm \
-        //                 -v "\$PWD":/src \
-        //                 -v "\$PWD/${OUTPUT_DIR}:/report" \
-        //                 owasp/dependency-check \
-        //                 --project "${PROJECT_NAME}-frontend" \
-        //                 --scan "/src/${FRONTEND_DIR}" \
-        //                 --format "ALL" \
-        //                 --out /report
-        //             """
-
-        //             // Run OWASP Dependency-Check on backend
-        //             sh """
-        //             docker run --rm \
-        //                 -v "\$PWD":/src \
-        //                 -v "\$PWD/${OUTPUT_DIR}:/report" \
-        //                 owasp/dependency-check \
-        //                 --project "${PROJECT_NAME}-backend" \
-        //                 --scan "/src/${BACKEND_DIR}" \
-        //                 --format "ALL" \
-        //                 --out /report
-        //             """
+        //         dir('Application-Code/backend') {
+        //             withSonarQubeEnv('sonarqube') {
+        //                 sh '''
+        //                     sonar-scanner \
+        //                       -Dsonar.projectKey=backend-project \
+        //                       -Dsonar.sources=. \
+        //                       -Dsonar.host.url=$SONAR_HOST_URL \
+        //                       -Dsonar.login=$SONARQUBE_TOKEN
+        //                 '''
+        //             }
         //         }
         //     }
         // }
 
-        // stage('Publish HTML Report') {
+        // stage('SonarQube Scan - Frontend') {
         //     steps {
-        //         publishHTML([
-        //             reportDir: "${OUTPUT_DIR}",
-        //             reportFiles: 'dependency-check-report.html',
-        //             reportName: 'OWASP Dependency-Check Report'
-        //         ])
+        //         dir('Application-Code/frontend') {
+        //             withSonarQubeEnv('sonarqube') {
+        //                 sh '''
+        //                     sonar-scanner \
+        //                       -Dsonar.projectKey=frontend-project \
+        //                       -Dsonar.sources=. \
+        //                       -Dsonar.host.url=$SONAR_HOST_URL \
+        //                       -Dsonar.login=$SONARQUBE_TOKEN
+        //                 '''
+        //             }
+        //         }
         //     }
         // }
 
-        stage('SonarQube Scan - Backend') {
-            steps {
-                dir('Application-Code/backend') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh '''
-                            sonar-scanner \
-                              -Dsonar.projectKey=backend-project \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=$SONAR_HOST_URL \
-                              -Dsonar.login=$SONARQUBE_TOKEN
-                        '''
-                    }
-                }
-            }
-        }
+        // stage('Build Docker Images') {
+        //     steps {
+        //         script {
+        //             docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
+        //             docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
+        //         }
+        //     }
+        // }
 
-        stage('SonarQube Scan - Frontend') {
-            steps {
-                dir('Application-Code/frontend') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh '''
-                            sonar-scanner \
-                              -Dsonar.projectKey=frontend-project \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=$SONAR_HOST_URL \
-                              -Dsonar.login=$SONARQUBE_TOKEN
-                        '''
-                    }
-                }
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    docker.build("${FRONTEND_IMAGE}", 'Application-Code/frontend')
-                    docker.build("${BACKEND_IMAGE}", 'Application-Code/backend')
-                }
-            }
-        }
-
-        stage('Trivy Scan') {
-            steps {
-                sh '''
-                    mkdir -p reports
-                    trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
-                    trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
-                '''
-            }
-        }
+        // stage('Trivy Scan') {
+        //     steps {
+        //         sh '''
+        //             mkdir -p reports
+        //             trivy image "${FRONTEND_IMAGE}" > reports/trivy_frontend.txt
+        //             trivy image "${BACKEND_IMAGE}" > reports/trivy_backend.txt
+        //         '''
+        //     }
+        // }
 
 
-        stage('Push to Docker Hub') {
-            steps {
-                withVault([
-                    vaultSecrets: [[
-                        path: 'kv/dockerhub-creds',
-                        secretValues: [
-                            [envVar: 'DOCKER_USERNAME', vaultKey: 'username'],
-                            [envVar: 'DOCKER_PASSWORD', vaultKey: 'password']
-                        ]
-                    ]]
-                ]) {
-                    script {
-                        sh '''
-                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                            docker push "${FRONTEND_IMAGE}"
-                            docker push "${BACKEND_IMAGE}"
-                        '''
-                    }
-                }
-            }
-        }
+        // stage('Push to Docker Hub') {
+        //     steps {
+        //         withVault([
+        //             vaultSecrets: [[
+        //                 path: 'kv/dockerhub-creds',
+        //                 secretValues: [
+        //                     [envVar: 'DOCKER_USERNAME', vaultKey: 'username'],
+        //                     [envVar: 'DOCKER_PASSWORD', vaultKey: 'password']
+        //                 ]
+        //             ]]
+        //         ]) {
+        //             script {
+        //                 sh '''
+        //                     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        //                     docker push "${FRONTEND_IMAGE}"
+        //                     docker push "${BACKEND_IMAGE}"
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
