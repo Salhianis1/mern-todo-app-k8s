@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        // SONARQUBE_TOKEN = credentials('sonarqube')
+        SONARQUBE_TOKEN = credentials('sonarqube')
         FRONTEND_IMAGE = 'salhianis20/frontend:latest'
         BACKEND_IMAGE = 'salhianis20/backend:latest'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
 
         FRONTEND_DIR = 'Application-Code/frontend'
         BACKEND_DIR = 'Application-Code/backend'
-        NVD_API_KEY = credentials('NVD_API_KEY')
+        // NVD_API_KEY = credentials('NVD_API_KEY')
         // OUTPUT_DIR = 'dependency-check-report'
         PROJECT_NAME = 'MERN-App'
     }
